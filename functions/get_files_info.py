@@ -1,4 +1,5 @@
 import os
+from google.genai import types
 
 #Acepts a directory path, and return a str that represents the contents
 #of that directory. This is a function for the LLM agent
@@ -38,3 +39,20 @@ def get_files_info(working_directory, directory="."):
     except Exception as e:
         return f"Error: {e}"
     
+#Defines a function that the model can generate JSON inputs for.
+#This tells the LLM how to use the specific function
+#The wd will be hard-coded so the LLM don't specify it
+schema_get_files_info = types.FunctionDeclaration(
+    name = "get_files_info", #Name of the function to call
+    description="List files in the specified directory along with their sizes, constrained to the working directory.",
+    #Schema that defines the format of input and output data
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="The directory to list files from, relative to the working directory. If not provided, lists files in the working directory itself.",
+            ),
+        },
+    ),
+)
