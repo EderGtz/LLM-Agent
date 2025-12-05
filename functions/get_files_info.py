@@ -56,3 +56,4 @@ schema_get_files_info = types.FunctionDeclaration(
         },
     ),
 )
+#get_files_info({'directory': 'pkg'})
