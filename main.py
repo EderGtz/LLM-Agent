@@ -6,7 +6,8 @@ from google import genai
 from google.genai import types
 
 from prompts import system_prompt
-from call_function import available_functions
+from available_functions import available_functions
+from call_function import call_function
 
 def main():
 
@@ -53,8 +54,20 @@ def generate_content(client, messages, verbose):
         print(response.text)
         return
 
+    function_responses_history = []
+
     for function_call_part in response.function_calls:
         print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+        function_call_result = call_function(function_call_part)
+        try:
+            #If the object does not have this, the function call failed
+            test_access = function_call_result.parts[0].function_response.response
+        except Exception:
+            raise RuntimeError("Fatal: call_function did not return a valid function_response object")
+        function_responses_history.append(function_call_result.parts[0])
+
+        if verbose:
+            print(f"-> {function_call_result.parts[0].function_response.response}")
 
 if __name__ == "__main__":
     main()
