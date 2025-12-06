@@ -86,7 +86,7 @@ def generate_content(client, messages, verbose):
                 
                 try:
                         #If the object does not have this, the function call failed
-                    test_access = function_call_result.parts[0].function_response.response
+                    function_result = function_call_result.parts[0].function_response.response
                 except Exception:
                     raise RuntimeError("Fatal: call_function did not return a valid function_response object")
                 
@@ -94,7 +94,7 @@ def generate_content(client, messages, verbose):
                 function_responses_history.append(response_part)
 
                 if verbose:
-                    print(f"-> {function_call_result.parts[0].function_response.response}")
+                    print(f"-> {function_result}")
 
             #Appending the function responses converted into a message into messages list
             messages.append(types.Content(role="user", parts=function_responses_history))
