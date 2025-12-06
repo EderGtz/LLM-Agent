@@ -32,7 +32,7 @@ schema_write_file = types.FunctionDeclaration(
                 description="The content to write to the file"
             ),
         },
-        required=["file_path"]
+        required=["file_path", "content"]
     ), 
 )
 #write_file({'file_path': 'main.txt', 'content': 'hello'})
