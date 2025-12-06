@@ -11,7 +11,7 @@ from functions.write_file import write_file
 def call_function(function_call_part, verbose=False):
 
     function_name = function_call_part.name
-    function_args = function_call_part.args
+    function_args = dict(function_call_part.args)
 
     if verbose:
         print(f"Calling function: {function_name}({function_args})")
@@ -25,29 +25,18 @@ def call_function(function_call_part, verbose=False):
         "write_file":write_file
     }
 
-    try:
-        if function_name == "write_file":
-            function_result = write_file(WORKING_DIR,**function_args)
-        elif function_name == "run_python_file":
-            function_result = run_python_file(WORKING_DIR,**function_args)
-        elif function_name == "get_file_content":
-            function_result = get_file_content(WORKING_DIR,**function_args)
-        elif function_name == "get_files_info":
-            function_result = get_files_info(WORKING_DIR,**function_args)
-        else:
-            #If the function name is not valid
-            return types.Content(
-                role="tool",
-                parts=[
-                    types.Part.from_function_response(
-                        name=function_name,
-                        response={"error": f"Unknown function: {function_name}"},
-                    )
-                ]
-            )
-    except Exception as e:
-        function_result = f"Error executing tool: {e}"
-
+    if function_name not in function_map:
+        return types.Content(
+            role="tool",
+            parts=[
+                types.Part.from_function_response(
+                    name=function_name,
+                    response={"error": f"Unknown function: {function_name}"},
+                )
+            ]
+        )
+    function_args["working_directory"] = WORKING_DIR
+    function_result = function_map[function_name](**function_args)
     #The tool role is defined to identify the responses from the system to the functions
     return types.Content(
         role="tool",
